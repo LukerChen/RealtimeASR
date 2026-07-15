@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RealtimeASR Demo — 实时语音识别</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* ---- Config ---- */
+    .card {
+      padding: 1rem 1.25rem;
+      background: #1e293b;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .card-title {
+      font-size: 0.7rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+
+    .form-row:last-child { margin-bottom: 0; }
+
+    .form-row label {
+      width: 90px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
+    .form-row input {
+      flex: 1;
+      padding: 0.45rem 0.6rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.8rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-row input:focus { border-color: #60a5fa; }
+
+    .note {
+      font-size: 0.7rem;
+      color: #475569;
+      margin-top: 0.5rem;
+    }
+
+    /* ---- Status ---- */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .status-dot.recording {
+      background: #ef4444;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .status-dot.connecting {
+      background: #f59e0b;
+      animation: pulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .status-label { font-size: 0.85rem; color: #94a3b8; }
+
+    /* ---- Volume ---- */
+    .volume-bar-outer {
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 0.25rem;
+    }
+
+    .volume-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+      border-radius: 3px;
+      transition: width 0.08s;
+      width: 0%;
+    }
+
+    .volume-val { font-size: 0.8rem; color: #94a3b8; text-align: right; }
+
+    /* ---- Wave ---- */
+    canvas {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      background: #0f172a;
+      display: block;
+    }
+
+    /* ---- Text ---- */
+    .partial-text {
+      font-size: 1.15rem;
+      color: #94a3b8;
+      min-height: 1.75rem;
+      word-break: break-all;
+    }
+
+    .result-list {
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+    }
+
+    .result-item {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+    }
+
+    /* ---- Error ---- */
+    .error-msg {
+      padding: 0.6rem 0.9rem;
+      background: #7f1d1d;
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #fca5a5;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ---- Buttons ---- */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-go {
+      background: #22c55e;
+      color: #0f172a;
+    }
+    .btn-go:hover:not(:disabled) { background: #16a34a; }
+
+    .btn-end {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-end:hover:not(:disabled) { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>RealtimeASR</h1>
+  <p class="subtitle">浏览器实时语音识别 Demo</p>
+
+  <div class="container">
+    <!-- 配置 -->
+    <div class="card">
+      <div class="card-title">🔧 腾讯云配置</div>
+      <div class="form-row">
+        <label>App ID</label>
+        <input id="appId" type="text" value="" placeholder="你的腾讯云 App ID" />
+      </div>
+      <div class="form-row">
+        <label>Secret ID</label>
+        <input id="secretId" type="text" value="" placeholder="SecretId" />
+      </div>
+      <div class="form-row">
+        <label>Secret Key</label>
+        <input id="secretKey" value="" type="password" placeholder="SecretKey" />
+      </div>
+      <p class="note">请前往腾讯云控制台开通实时语音识别，获取以上三个参数</p>
+    </div>
+
+    <!-- 状态 -->
+    <div class="card">
+      <div class="status-row">
+        <div class="status-dot" id="statusDot"></div>
+        <span class="status-label" id="statusText">就绪</span>
+      </div>
+    </div>
+
+    <!-- 音量 -->
+    <div class="card">
+      <div class="card-title">🔊 音量 (RMS)</div>
+      <div class="volume-bar-outer">
+        <div class="volume-bar-inner" id="volumeBar"></div>
+      </div>
+      <div class="volume-val" id="volumeVal">0</div>
+    </div>
+
+    <!-- 波形 -->
+    <div class="card">
+      <div class="card-title">📈 实时波形</div>
+      <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <!-- 字幕 -->
+    <div class="card">
+      <div class="card-title">💬 实时字幕</div>
+      <div class="partial-text" id="partialText"></div>
+      <div class="result-list" id="resultList"></div>
+    </div>
+
+    <!-- 错误 -->
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- 按钮 -->
+    <div class="btn-row">
+      <button class="btn btn-go" id="btnStart">🎙️ 开始录音</button>
+      <button class="btn btn-end" id="btnStop" disabled>⏹️ 停止</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
