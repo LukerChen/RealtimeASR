@@ -4,6 +4,8 @@
 
 一个专注于**浏览器实时语音识别**的 TypeScript SDK，提供完整的录音链路，但不负责 UI。
 
+<video src="demo.mov" width="600" controls></video>
+
 ```
 Mic → PCM → ASR → Text
 ```
