@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').copyFileSync('src/audio-processor.js','dist/audio-processor.js')\"",
+    "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run build"

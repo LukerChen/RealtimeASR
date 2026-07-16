@@ -15,6 +15,7 @@ import { Resampler } from './Resampler.js'
 import { FrameBuffer } from './FrameBuffer.js'
 import { VolumeMeter } from './VolumeMeter.js'
 import { AudioError, StateError } from './errors.js'
+import { AUDIO_PROCESSOR_CODE } from './audio-processor-worklet.js'
 
 /**
  * 默认配置
@@ -348,11 +349,13 @@ export class Recorder {
 
   /**
    * 解析 AudioWorklet processor 的脚本路径
+   *
+   * 将 processor 代码内联为 Blob URL，不依赖外部文件路径，
+   * 兼容所有 bundler（webpack / Vite / esbuild 等）。
    */
   private resolveProcessorPath(): string {
-    // 使用相对于当前脚本的路径
-    // 在构建输出中，audio-processor.js 位于 dist 目录下
-    return new URL('./audio-processor.js', import.meta.url).href
+    const blob = new Blob([AUDIO_PROCESSOR_CODE], { type: 'application/javascript' })
+    return URL.createObjectURL(blob)
   }
 
   /**
