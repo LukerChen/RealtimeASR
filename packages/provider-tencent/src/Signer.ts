@@ -10,6 +10,8 @@ export interface SignParams {
   appId: string
   secretId: string
   secretKey: string
+  /** 临时密钥 Token（使用临时密钥时必传） */
+  token?: string
 }
 
 /** ASR WebSocket 服务地址 */

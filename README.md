@@ -30,14 +30,29 @@ packages/
 └── shared/                # 共享类型定义
 ```
 
+## 📋 依赖环境
+
+1. 使用相关产品前需要在腾讯云控制台已开通相关语音产品。
+2. 在腾讯云控制台[访问管理](https://console.cloud.tencent.com/cam/capi)页面获取 SecretID 和 SecretKey。
+3. 在腾讯云控制台[账号信息](https://console.cloud.tencent.com/developer)页面获取 AppId。
+4. 将获取的参数填入 `examples/config.js` 中。
+
+> ⚠️ **注意：**
+> 1. SecretID 和 SecretKey 作为敏感信息，不建议直接放在前端代码里运行，可以通过接口服务获取，同时建议采取临时密钥方案，具体可参考 [临时身份凭证](https://cloud.tencent.com/document/product/1312/48195)。
+> 2. 将获取到的 `tmpSecretId`、`tmpSecretKey` 和 `Token` 依次作为参数 `secretId`、`secretKey` 和 `token` 传入。
+
 ## 🚀 快速开始
 
 ### 安装
 
 ```bash
-pnpm install
-pnpm build
+npm install @realtime-asr/core @realtime-asr/provider-tencent
 ```
+
+> 或者使用 pnpm / yarn：
+> ```bash
+> pnpm add @realtime-asr/core @realtime-asr/provider-tencent
+> ```
 
 ### 使用
 
@@ -148,6 +163,8 @@ interface RecorderOptions {
 
 使用前请在[腾讯云控制台](https://console.cloud.tencent.com/asr)开通实时语音识别服务。
 
+**固定密钥方式：**
+
 ```ts
 const provider = new TencentProvider({
   appId: 'your-app-id',
@@ -155,6 +172,19 @@ const provider = new TencentProvider({
   secretKey: 'your-secret-key',
   engineModelType: '16k_zh',  // 可选
   needVad: 0,                 // 可选
+})
+```
+
+**临时密钥方式（推荐）：**
+
+> 固定密钥放在前端代码中存在泄漏风险，强烈建议通过后端接口获取临时密钥。参考 [临时身份凭证](https://cloud.tencent.com/document/product/1312/48195)。
+
+```ts
+const provider = new TencentProvider({
+  appId: 'your-app-id',
+  secretId: tmpSecretId,     // 临时 SecretId
+  secretKey: tmpSecretKey,   // 临时 SecretKey
+  token: sessionToken,       // 临时 Token
 })
 ```
 

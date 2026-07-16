@@ -87,6 +87,7 @@ export class TencentProvider implements ASRProvider {
       appId: options.appId,
       secretId: options.secretId,
       secretKey: options.secretKey,
+      token: options.token,
       engineModelType: options.engineModelType ?? DEFAULT_ASR_PARAMS.engine_model_type ?? '16k_zh',
       needVad: options.needVad ?? DEFAULT_ASR_PARAMS.needvad ?? 0,
       filterDirty: options.filterDirty ?? DEFAULT_ASR_PARAMS.filter_dirty ?? 0,
@@ -226,6 +227,7 @@ export class TencentProvider implements ASRProvider {
       hotword_id: this.options.hotwordId,
       customization_id: this.options.customizationId,
       word_info: this.options.wordInfo,
+      token: this.options.token,
     }
 
     return this.signer.generateURL(params)

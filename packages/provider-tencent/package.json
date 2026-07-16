@@ -1,6 +1,6 @@
 {
   "name": "@realtime-asr/provider-tencent",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Tencent Cloud ASR provider for RealtimeASR SDK",
   "type": "module",
   "main": "./dist/index.js",
