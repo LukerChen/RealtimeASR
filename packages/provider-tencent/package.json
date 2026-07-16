@@ -1,7 +1,7 @@
 {
   "name": "@realtime-asr/provider-tencent",
   "version": "1.0.0",
-  "private": true,
+  "description": "Tencent Cloud ASR provider for RealtimeASR SDK",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -12,12 +12,38 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@realtime-asr/shared": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LukerChen/RealtimeASR.git"
+  },
+  "homepage": "https://github.com/LukerChen/RealtimeASR#readme",
+  "bugs": {
+    "url": "https://github.com/LukerChen/RealtimeASR/issues"
+  },
+  "author": "Luker Chen",
+  "license": "MIT",
+  "keywords": [
+    "asr",
+    "speech-recognition",
+    "realtime",
+    "browser",
+    "tencent",
+    "tencent-cloud",
+    "speech-to-text"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
